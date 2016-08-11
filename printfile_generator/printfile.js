@@ -1,7 +1,8 @@
 const gcloud   = require('gcloud');
 const jimp     = require('jimp');
 
-// Methods here
+// =========== Methods ============
+
 /**
  * Mapping function. Maps all decimals range
  * (.4 - 2.5) -> { 2:3, 3:4, 4:5, 1:1 and reciprocals}
@@ -48,10 +49,16 @@ getPaddingRatio = (w,h, widthRatio) => {
  */
 authenticateArtist = () => {
     //READMORE: http://googlecloudplatform.github.io/gcloud-node/#/docs/v0.37.0/storage/file?method=createWriteStream
-    return gcloud.storage({
-        keyFilename: './auth/artistKey.json',
-        projectId  : 'artist-tekuma-4a697'
-    });
+    let a_auth;
+    try {
+        a_auth = gcloud.storage({
+            keyFilename: './auth/artistKey.json',
+            projectId  : 'artist-tekuma-4a697'
+        });
+    } catch (e) {
+        console.log(">Error with Artist Atuh:",e);
+    }
+    return a_auth;
 }
 
 /**
@@ -59,10 +66,16 @@ authenticateArtist = () => {
  */
 authenticateCurator = () => {
     //READMORE: http://googlecloudplatform.github.io/gcloud-node/#/docs/v0.37.0/storage/file?method=createWriteStream
-    return gcloud.storage({
-        keyFilename: './auth/curatorKey.json',
-        projectId  : 'curator-tekuma'
-    });
+    let c_auth;
+    try {
+        c_auth = gcloud.storage({
+            keyFilename: './auth/curatorKey.json',
+            projectId  : 'curator-tekuma'
+        });
+    } catch (e) {
+        console.log(">Error with Curator Auth:",e);
+    }
+    return c_auth;
 }
 
 /**
@@ -95,7 +108,6 @@ cloudCreatePrintfile = (uid, artworkUID, artistName) => {
     master.download((err,artBuffer)=>{
         if (err) {
             console.log(err);
-            res.status(500).send({error:"Error connecting to Art Bucket file", e:err});
         }
 
         jimp.read(artBuffer).then((artwork)=>{
@@ -159,10 +171,8 @@ cloudCreatePrintfile = (uid, artworkUID, artistName) => {
                                printfile.save(printBuffer,options, function (err) {
                                    if (!err) {
                                        console.log(">>>Printfile Generated Successfully");
-                                       res.status(200).send(">Printfile Generated Successfully")
                                    } else {
                                        console.log(">>>171:",err);
-                                       res.status(500).send({error: ">Error uploading to Curator, but file was made"});
                                    }
                                });
                            });
@@ -172,7 +182,6 @@ cloudCreatePrintfile = (uid, artworkUID, artistName) => {
                 });
             } else {
                 console.log(">Image Error. Min w or h is "+minArtworkDim+" px. Was:",artWidth,artHeight);
-                res.status(400).send({error: "Requested image does not meet 1800x1800px minimum."});
             }
         });
     });
@@ -262,18 +271,19 @@ createPrintfile = (inFile, outFile, artistName) => {
 }
 
 
+// ============= Scripts ===================
 
 // Set the name to be printed on the file Here :
 let artist_name = "Kanye 'Yeezy' West";
 
 
-let artist_uid  = "";
-let artwork_uid = "";
+let artist_uid  = "cacxZwqfArVzrUXD5tn1t24OlJJ2";
+let artwork_uid = "-KOuiB8jr3euq6cWxnQX";
 // OR
 let in_file     = "infile.jpg";
 let out_file    = "output2.jpg";
 
 
-createPrintfile(in_file,out_file, artist_name);
+// createPrintfile(in_file,out_file, artist_name);
 
-// cloudCreatePrintfile(artist_uid, artwork_uid, artist_name);
+cloudCreatePrintfile(artist_uid, artwork_uid, artist_name);
