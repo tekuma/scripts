@@ -87,10 +87,9 @@ authenticateCurator = () => {
  * @param  {[String]} artistName [What will be printed on the printfile label]
  */
 cloudCreatePrintfile = (uid, artworkUID, artistName) => {
-    let curatorStorage = authenticateCurator();
-    let artStorage     = authenticateArtist();
 
-    let pfBucket   = curatorStorage.bucket("printfiles");
+    const artStorage  = authenticateArtist();
+
     let artBucket  = artStorage.bucket("art-uploads");
     let artPath    = "portal/" + uid + "/uploads/" + artworkUID;
     let master     = artBucket.file(artPath);
@@ -160,7 +159,10 @@ cloudCreatePrintfile = (uid, artworkUID, artistName) => {
                            .composite(fullLabel, labelX,labelY)
                            .rgba(false)
                            .getBuffer(jimp.MIME_PNG, function (err,printBuffer){
-                               let savePath  = uid + '/' + artworkUID;
+                               const curatorStorage = authenticateCurator();
+                               const pfBucket       = curatorStorage.bucket("printfiles");
+
+                               let savePath  = `${uid}/${artworkUID}`;
                                let printfile = pfBucket.file(savePath);
                                let options   = {
                                    metadata:{
