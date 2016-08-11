@@ -61,7 +61,7 @@ authenticateCurator = () => {
     //READMORE: http://googlecloudplatform.github.io/gcloud-node/#/docs/v0.37.0/storage/file?method=createWriteStream
     return gcloud.storage({
         keyFilename: './auth/curatorKey.json',
-        projectId  : 'artist-tekuma-4a697'
+        projectId  : 'curator-tekuma'
     });
 }
 
