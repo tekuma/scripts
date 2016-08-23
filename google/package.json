@@ -1,0 +1,16 @@
+{
+  "name": "google",
+  "version": "1.0.0",
+  "description": "",
+  "main": "firebase-db-script-test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "firebase": "^3.3.0",
+    "jsonfile": "^2.3.1",
+    "request": "^2.74.0"
+  }
+}
