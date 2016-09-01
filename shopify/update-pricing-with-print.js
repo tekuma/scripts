@@ -52,7 +52,7 @@ getAllProductIDs = () => {
                     limit : limit,
                     page  : i,
                     fields: "id",
-                    // created_at_min: "2016-08-25T16:15:47-04:00"
+                    created_at_min: "2016-08-25T16:15:47-04:00"
                     //    An option to reduce the size of product list
                 };
                 Shopify.get('/admin/products.json', params, (err, data, headers)=>{
@@ -62,6 +62,7 @@ getAllProductIDs = () => {
                     }
                     finished++;
                     if (finished === pages) { //last callback
+                        console.log("got all ids");
                         resolve(ids);
                     }
 
@@ -78,6 +79,7 @@ getStandardVariants      = (productID) => {
     };
     return new Promise((resolve, reject)=>{
         Shopify.get(queryString,params, (err, data, headers) => {
+        //  console.log("success");
             if (data.product.tags.toLowerCase().indexOf('limited') == -1) {
                 resolve(data.product.variants);
             } else {
@@ -87,7 +89,7 @@ getStandardVariants      = (productID) => {
     });
 }
 
-updateVariant = (id, size, oldPrice) => {
+updateVariant = (id, frameOption, size, oldPrice) => {
     if (size.indexOf('×') == -1) { //using 'x' instead of '×'
         if (size.indexOf('x') == -1) {
             console.log(">ERR: Variant size error", size);
@@ -100,12 +102,13 @@ updateVariant = (id, size, oldPrice) => {
         console.log("!>", id, size);
     }
 
-    if (oldPrice != newPrice) {
+    if (oldPrice != newPrice && frameOption == "Framed") {
         let updatedData = {
             "variant": {
                 "id"     : id,
                 "price"  : newPrice,
-                "option1": size
+                "option1": size,
+                "option2": frameOption
             }
         };
         let queryString = `/admin/variants/${id}.json`
@@ -124,7 +127,8 @@ updateVariant = (id, size, oldPrice) => {
 
 /// ================-Logic Here-========================
 
-getAllProductIDs().then( (productIDs)=> {
+getAllProductIDs()
+  .then( (productIDs)=> {
     for (id of productIDs) {
         getStandardVariants(id).then( (variants)=>{
             // variants will be [] if no standard variants
@@ -132,7 +136,8 @@ getAllProductIDs().then( (productIDs)=> {
                 let size    = variant.option1;
                 let var_id  = variant.id;
                 let price   = variant.price;
-                updateVariant(var_id, size, price);
+                let frame   = variant.option2;
+                updateVariant(var_id, frame, size, price);
             }
         });
     }

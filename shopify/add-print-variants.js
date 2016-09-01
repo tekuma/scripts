@@ -35,7 +35,9 @@ getAllProductIDs = () => {
                 let params = {
                     limit : limit,
                     page  : i,
-                    fields: "id"
+                    fields: "id",
+                    created_at_min: "2016-08-25T16:15:47-04:00"
+                    //    An option to reduce the size of product list
                 };
                 Shopify.get('/admin/products.json', params, (err, data, headers)=>{
                     for (let j = 0; j < data.products.length; j++) {
@@ -44,6 +46,7 @@ getAllProductIDs = () => {
                     }
                     finished++;
                     if (finished === pages) { //last callback
+                        console.log(ids);
                         resolve(ids);
                     }
 
@@ -55,7 +58,7 @@ getAllProductIDs = () => {
 
 getProductIDsTest = () => {
   return new Promise( (resolve, reject) => {
-    let IDsTest = [5085052100,5085062852];
+    let IDsTest = [6438266820];
     console.log("get IDs");
     resolve(IDsTest);
   });
@@ -78,6 +81,8 @@ addOptionToProduct = (ProductID) => {
 
       // Get the array of options
       let productOptions = data.product.options;
+      let productOptionsTest = data.product.options;
+
 
       // Set each product option2 as "Framed"
       // So that it doesn't create error when creating an "Frame" option later
@@ -105,19 +110,20 @@ addOptionToProduct = (ProductID) => {
       }
 
       //  let productQuery = '/admin/products/' + ProductID + '.json';
-
-      Shopify.put(productQuery,productUpdate, (err, data, headers) => {
-          if (err == undefined) {
-              console.log("-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-");
-              console.log(`>> Updated Product: ${ProductID}`);
-              console.log(">>>Sucessfully added an option 'Frame'");
-              resolve(data);
-          } else {
-              resolve([]);
-              console.log(`---Error Updating ${ProductID}:`, err);
-          }
-      });
-
+      console.log(productOptionsTest.length);
+      if (productOptionsTest.length != 3) {
+        Shopify.put(productQuery,productUpdate, (err, data, headers) => {
+            if (err == undefined) {
+                console.log("-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-");
+                console.log(`>> Updated Product: ${ProductID}`);
+                console.log(">>>Sucessfully added an option 'Frame'");
+                resolve(data);
+            } else {
+                resolve([]);
+                console.log(`---Error Updating ${ProductID}:`, err);
+            }
+        });
+      }
     });
   });
 }
@@ -205,5 +211,5 @@ executeAll = () => {
 
 // =========== Execute ==============
 
-
+//executeAllTest()
 executeAll();
